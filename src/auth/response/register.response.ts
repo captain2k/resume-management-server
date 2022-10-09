@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 
 export class ResgisterResponse {
-  id: number;
+  id: string;
 
   firstName: string;
   lastName: string;
