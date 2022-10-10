@@ -15,3 +15,8 @@ model User {
   email String  @unique
   name  String?
 }
+
+model Technology {
+  id   String @id @default(uuid())
+  name String
+}
