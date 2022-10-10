@@ -1,13 +1,15 @@
-import { Exclude } from 'class-transformer';
+import { Token } from '../entities/token.entity';
 
-export class ResgisterResponse {
+class UserEntity {
   id: string;
 
   firstName: string;
   lastName: string;
 
   email: string;
+}
 
-  @Exclude()
-  password: string;
+export class ResgisterResponse {
+  user: UserEntity;
+  token: Token;
 }

@@ -26,6 +26,4 @@ model User {
   firstName String
 
   role Roles @default(HR)
-
-  @@map("user")
 }
