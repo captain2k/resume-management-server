@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -16,25 +15,22 @@ export class TechnologiesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: TechnologiesDto): Promise<TechnologyEntity> {
-    if (dto.name) {
-      const checkTechnologyName = await this.prisma.technology.findUnique({
-        where: {
-          name: dto.name,
-        },
-      });
+    const checkTechnologyName = await this.prisma.technology.findUnique({
+      where: {
+        name: dto.name,
+      },
+    });
 
-      if (checkTechnologyName)
-        throw new ConflictException('Technology has been exist');
+    if (checkTechnologyName)
+      throw new ConflictException('Technology has been exist');
 
-      const technology = await this.prisma.technology.create({
-        data: {
-          ...dto,
-        },
-      });
-      console.log(technology);
+    const technology = await this.prisma.technology.create({
+      data: {
+        ...dto,
+      },
+    });
 
-      return technology;
-    } else throw new BadRequestException();
+    return technology;
   }
 
   async update(
