@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { GetTechnologiesArgs } from './args/get-technologies.args';
-import { TechnologiesDto } from './dto/technologies.dto';
+import { CreateTechnologiesDto } from './dto/technologies.dto';
 import { UpdateTechnologiesDto } from './dto/technologies.update.dto';
 import { TechnologyEntity } from './entities/technologies.entity';
 import { GetTechnologiesResponse } from './response/get-technologies.response';
@@ -20,7 +20,7 @@ export class TechnologiesController {
   constructor(private readonly technologyService: TechnologiesService) {}
 
   @Post()
-  create(@Body() dto: TechnologiesDto): Promise<TechnologyEntity> {
+  create(@Body() dto: CreateTechnologiesDto): Promise<TechnologyEntity> {
     return this.technologyService.create(dto);
   }
 

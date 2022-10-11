@@ -1,3 +1,5 @@
 import { PaginationArgs } from 'src/common/args/pagination.args';
 
-export class GetTechnologiesArgs extends PaginationArgs {}
+export class GetTechnologiesArgs extends PaginationArgs {
+  name?: string;
+}

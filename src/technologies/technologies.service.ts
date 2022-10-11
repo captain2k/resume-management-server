@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import { GetTechnologiesArgs } from './args/get-technologies.args';
-import { TechnologiesDto } from './dto/technologies.dto';
+import { CreateTechnologiesDto } from './dto/technologies.dto';
 import { UpdateTechnologiesDto } from './dto/technologies.update.dto';
 import { TechnologyEntity } from './entities/technologies.entity';
 import { GetTechnologiesResponse } from './response/get-technologies.response';
@@ -14,7 +14,7 @@ import { GetTechnologiesResponse } from './response/get-technologies.response';
 export class TechnologiesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: TechnologiesDto): Promise<TechnologyEntity> {
+  async create(dto: CreateTechnologiesDto): Promise<TechnologyEntity> {
     const checkTechnologyName = await this.prisma.technology.findUnique({
       where: {
         name: dto.name,
@@ -24,13 +24,11 @@ export class TechnologiesService {
     if (checkTechnologyName)
       throw new ConflictException('Technology has been exist');
 
-    const technology = await this.prisma.technology.create({
+    return this.prisma.technology.create({
       data: {
         ...dto,
       },
     });
-
-    return technology;
   }
 
   async update(
@@ -52,7 +50,7 @@ export class TechnologiesService {
 
     if (uniqueName) throw new ConflictException('Tech is exist');
 
-    const tech = await this.prisma.technology.update({
+    return this.prisma.technology.update({
       where: {
         id,
       },
@@ -60,8 +58,6 @@ export class TechnologiesService {
         ...dto,
       },
     });
-
-    return tech;
   }
 
   async delete(id: string): Promise<boolean> {
@@ -82,14 +78,21 @@ export class TechnologiesService {
   }
 
   async getMany(query: GetTechnologiesArgs): Promise<GetTechnologiesResponse> {
-    const { limit: take, offset: skip } = query;
+    const { limit: take, offset: skip, name } = query;
+
     const [total, technologies] = await this.prisma.$transaction([
       this.prisma.technology.count(),
       this.prisma.technology.findMany({
-        skip,
-        take,
+        where: {
+          name: {
+            search: name,
+          },
+        },
+        skip: +skip,
+        take: +take,
       }),
     ]);
+    console.log(take, total);
 
     return {
       pagination: {
@@ -101,7 +104,7 @@ export class TechnologiesService {
   }
 
   async getOne(id: string): Promise<TechnologyEntity> {
-    const technology = await this.prisma.technology.findFirst({
+    const technology = await this.prisma.technology.findUnique({
       where: {
         id,
       },
