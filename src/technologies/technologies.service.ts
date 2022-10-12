@@ -5,11 +5,10 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
-import { GetTechnologiesArgs } from './args/get-technologies.args';
-import { CreateTechnologiesDto } from './dto/technologies.dto';
-import { UpdateTechnologiesDto } from './dto/technologies.dto';
-import { TechnologyEntity } from './entities/technologies.entity';
-import { GetTechnologiesResponse } from './response/technologies.response';
+import { GetTechnologiesArgs } from './args/technology.args';
+import { CreateTechnologyDto, UpdateTechnologyDto } from './dto/technology.dto';
+import { TechnologyEntity } from './entities/technology.entity';
+import { GetTechnologiesResponse } from './response/technology.response';
 
 @Injectable()
 export class TechnologiesService {
@@ -22,19 +21,13 @@ export class TechnologiesService {
       },
     });
 
-    if (!technology) throw new NotFoundException('Technology is not exist');
+    if (!technology) throw new NotFoundException('Technology does not exist');
+
     return technology;
   }
 
-  async create(dto: CreateTechnologiesDto): Promise<TechnologyEntity> {
-    const checkTechnologyName = await this.prisma.technology.findUnique({
-      where: {
-        name: dto.name,
-      },
-    });
-
-    if (checkTechnologyName)
-      throw new ConflictException('Technology has been exist');
+  async create(dto: CreateTechnologyDto): Promise<TechnologyEntity> {
+    await this.checkDuplicateName(dto.name);
 
     return this.prisma.technology.create({
       data: {
@@ -45,18 +38,13 @@ export class TechnologiesService {
 
   async update(
     id: string,
-    dto: UpdateTechnologiesDto,
+    dto: UpdateTechnologyDto,
   ): Promise<TechnologyEntity> {
-    // Check technology exist
-    this.getOne(id);
+    const technology = await this.getOne(id);
 
-    const uniqueName = await this.prisma.technology.findFirst({
-      where: {
-        name: dto.name,
-      },
-    });
-
-    if (uniqueName) throw new ConflictException('Tech is exist');
+    if (dto.name && technology.name !== dto.name) {
+      await this.checkDuplicateName(dto.name);
+    }
 
     return this.prisma.technology.update({
       where: {
@@ -69,8 +57,7 @@ export class TechnologiesService {
   }
 
   async delete(id: string): Promise<boolean> {
-    // Check technology exist
-    this.getOne(id);
+    await this.getOne(id);
 
     await this.prisma.technology.delete({
       where: {
@@ -82,7 +69,7 @@ export class TechnologiesService {
   }
 
   async getMany(query: GetTechnologiesArgs): Promise<GetTechnologiesResponse> {
-    const { limit: take, offset: skip, name } = query;
+    const { limit, offset, name } = query;
 
     const where: Prisma.TechnologyWhereInput = {
       name: {
@@ -97,15 +84,27 @@ export class TechnologiesService {
       }),
       this.prisma.technology.findMany({
         where,
-        skip,
-        take,
+        skip: offset,
+        take: limit,
       }),
     ]);
     return {
       pagination: {
-        total,
+        limit,
+        offset,
       },
       data: technologies,
+      total,
     };
+  }
+  private async checkDuplicateName(name: string): Promise<void> {
+    const checkTechnologyName = await this.prisma.technology.findUnique({
+      where: {
+        name,
+      },
+    });
+
+    if (checkTechnologyName)
+      throw new ConflictException('Technology name has already existed');
   }
 }

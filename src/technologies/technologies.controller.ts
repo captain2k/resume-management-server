@@ -8,11 +8,10 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { GetTechnologiesArgs } from './args/get-technologies.args';
-import { CreateTechnologiesDto } from './dto/technologies.dto';
-import { UpdateTechnologiesDto } from './dto/technologies.dto';
-import { TechnologyEntity } from './entities/technologies.entity';
-import { GetTechnologiesResponse } from './response/technologies.response';
+import { GetTechnologiesArgs } from './args/technology.args';
+import { CreateTechnologyDto, UpdateTechnologyDto } from './dto/technology.dto';
+import { TechnologyEntity } from './entities/technology.entity';
+import { GetTechnologiesResponse } from './response/technology.response';
 import { TechnologiesService } from './technologies.service';
 
 @Controller('technologies')
@@ -20,14 +19,14 @@ export class TechnologiesController {
   constructor(private readonly technologyService: TechnologiesService) {}
 
   @Post()
-  create(@Body() dto: CreateTechnologiesDto): Promise<TechnologyEntity> {
+  create(@Body() dto: CreateTechnologyDto): Promise<TechnologyEntity> {
     return this.technologyService.create(dto);
   }
 
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() dto: UpdateTechnologiesDto,
+    @Body() dto: UpdateTechnologyDto,
   ): Promise<TechnologyEntity> {
     return this.technologyService.update(id, dto);
   }
