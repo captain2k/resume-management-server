@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { GetTechnologiesArgs } from './args/get-technologies.args';
 import { CreateTechnologiesDto } from './dto/technologies.dto';
-import { UpdateTechnologiesDto } from './dto/technologies.update.dto';
+import { UpdateTechnologiesDto } from './dto/technologies.dto';
 import { TechnologyEntity } from './entities/technologies.entity';
-import { GetTechnologiesResponse } from './response/get-technologies.response';
+import { GetTechnologiesResponse } from './response/technologies.response';
 import { TechnologiesService } from './technologies.service';
 
 @Controller('technologies')

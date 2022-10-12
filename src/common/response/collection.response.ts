@@ -1,5 +1,6 @@
-import { PaginationResponse } from './pagination.response';
-
+export class PaginationResponse {
+  total: number;
+}
 export class CollectionResponse<T> {
   pagination: PaginationResponse;
 
