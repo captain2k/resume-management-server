@@ -20,7 +20,31 @@ model User {
 model Technology {
   id String @id @default(uuid())
 
-  name String @unique
+  name                   String                   @unique
+  TechnologiesInProjects TechnologiesInProjects[]
 
   @@map("technology")
+}
+
+model Project {
+  id String @id @default(uuid())
+
+  title                  String
+  description            String
+  startDate              DateTime?
+  endDate                DateTime?
+  duration               Int
+  TechnologiesInProjects TechnologiesInProjects[]
+
+  @@map("project")
+}
+
+model TechnologiesInProjects {
+  id String @id @default(uuid())
+
+  technology   Technology @relation(fields: [technologyId], references: [id])
+  technologyId String
+
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
 }
