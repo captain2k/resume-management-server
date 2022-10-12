@@ -92,9 +92,9 @@ export class TechnologiesService {
       pagination: {
         limit,
         offset,
+        total,
       },
       data: technologies,
-      total,
     };
   }
   private async checkDuplicateName(name: string): Promise<void> {
