@@ -30,3 +30,29 @@ export class CreateProjectDto {
   @IsString({ each: true })
   technologyIds: string[];
 }
+
+export class UpdateProjectDto {
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsDate()
+  @IsOptional()
+  startDate?: Date;
+
+  @IsDate()
+  @IsOptional()
+  endDate?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  duration?: number;
+
+  @IsString({ each: true })
+  @IsOptional()
+  technologyIds?: string[];
+}

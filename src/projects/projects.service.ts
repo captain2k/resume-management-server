@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 import { ProjectArgs } from './args/project.args';
-import { CreateProjectDto } from './dto/project.dto';
+import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
 import {
   GetProjectResponse,
   ProjectResponse,
@@ -116,4 +116,65 @@ export class ProjectsService {
 
     return results;
   }
+
+  async update(
+    projectId: string,
+    dto: UpdateProjectDto,
+  ): Promise<ProjectResponse> {
+    await this.getOne(projectId);
+    const results = await this.prisma.$transaction(async (transaction) => {
+      const { technologyIds, ...rest } = dto;
+
+      await transaction.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          ...rest,
+        },
+      });
+
+      // await transaction.technologyProject.updateMany({
+      //   where: {
+      //     projectId,
+      //   },
+      //   data: {
+      //     technologyId: technologyIds.map((item) => item),
+      //   },
+      // });
+    });
+
+    return;
+  }
+
+  async delete(projectId: string): Promise<boolean> {
+    await this.getOne(projectId);
+
+    const result = await this.prisma.$transaction(async (transaction) => {
+      await transaction.technologyProject.deleteMany({
+        where: {
+          projectId,
+        },
+      });
+      await transaction.project.delete({ where: { id: projectId } });
+
+      return true;
+    });
+
+    return result;
+  }
+
+  // private async findTechnologyProjectId(id: string): Promise<string> {
+  //   const technologyProject = await this.prisma.technologyProject.findFirst({
+  //     where: {
+  //       projectId: id,
+  //     },
+  //     select: {
+  //       id: true,
+  //     },
+  //   });
+  //   console.log(technologyProject);
+
+  //   return technologyProject.id;
+  // }
 }
