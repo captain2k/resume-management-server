@@ -26,4 +26,7 @@ export class CreateProjectDto {
   @IsNotEmpty()
   @IsNumber()
   duration: number;
+
+  @IsString({ each: true })
+  technologyIds: string[];
 }

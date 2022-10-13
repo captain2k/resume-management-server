@@ -3,10 +3,10 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
+  previewFeatures = ["interactiveTransactions"]
 }
 
-datasource db {   
+datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
@@ -20,8 +20,9 @@ model User {
 model Technology {
   id String @id @default(uuid())
 
-  name                   String                   @unique
-  TechnologiesInProjects TechnologiesInProjects[]
+  name String @unique
+
+  technologyProject TechnologyProject[]
 
   @@map("technology")
 }
@@ -29,17 +30,18 @@ model Technology {
 model Project {
   id String @id @default(uuid())
 
-  title                  String
-  description            String
-  startDate              DateTime?
-  endDate                DateTime?
-  duration               Int
-  TechnologiesInProjects TechnologiesInProjects[]
+  title       String
+  description String
+  startDate   DateTime?
+  endDate     DateTime?
+  duration    Int
+
+  technologyProject TechnologyProject[]
 
   @@map("project")
 }
 
-model TechnologiesInProjects {
+model TechnologyProject {
   id String @id @default(uuid())
 
   technology   Technology @relation(fields: [technologyId], references: [id])
@@ -48,5 +50,5 @@ model TechnologiesInProjects {
   project   Project @relation(fields: [projectId], references: [id])
   projectId String
 
-  @@map("technologies_projects")
+  @@map("technology-project")
 }
