@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 import { ProjectArgs } from './args/project.args';
@@ -92,21 +96,28 @@ export class ProjectsService {
         },
       });
 
-      await transaction.technologyProject.createMany({
-        data: technologyIds.map((item) => {
-          return {
-            projectId: project.id,
-            technologyId: item,
-          };
-        }),
-        skipDuplicates: true,
-      });
+      let technologies = [];
 
-      const technologies = await transaction.technology.findMany({
-        where: {
-          id: { in: technologyIds },
-        },
-      });
+      if (technologyIds.length > 0) {
+        technologies = await transaction.technology.findMany({
+          where: {
+            id: { in: technologyIds },
+          },
+        });
+
+        if (technologies.length !== technologyIds.length)
+          throw new NotFoundException('At least one technology does not exist');
+
+        await transaction.technologyProject.createMany({
+          data: technologyIds.map((item) => {
+            return {
+              projectId: project.id,
+              technologyId: item,
+            };
+          }),
+          skipDuplicates: true,
+        });
+      }
 
       return {
         ...project,
@@ -122,9 +133,10 @@ export class ProjectsService {
     dto: UpdateProjectDto,
   ): Promise<ProjectResponse> {
     await this.getOne(projectId);
-    const results = await this.prisma.$transaction(async (transaction) => {
-      const { technologyIds, ...rest } = dto;
 
+    const { technologyIds, ...rest } = dto;
+
+    const results = await this.prisma.$transaction(async (transaction) => {
       await transaction.project.update({
         where: {
           id: projectId,
@@ -134,14 +146,41 @@ export class ProjectsService {
         },
       });
 
-      // await transaction.technologyProject.updateMany({
+      const unUsedTechnology = await transaction.technologyProject.findMany({
+        where: {
+          projectId,
+          technologyId: { notIn: technologyIds },
+        },
+      });
+
+      // await transaction.technologyProject.deleteMany({
       //   where: {
-      //     projectId,
-      //   },
-      //   data: {
-      //     technologyId: technologyIds.map((item) => item),
+      //     AND: [
+      //       {
+      //         projectId,
+      //       },
+      //       {
+      //         technologyId: {
+      //           in: unUsedTechnology.map((item) => item.technologyId),
+      //         },
+      //       },
+      //     ],
       //   },
       // });
+
+      await transaction.technologyProject
+        .findMany({
+          where: {
+            projectId,
+          },
+        })
+        .then(async (data) => {
+          console.log('tech', data);
+          const uniqueTech = data.filter(
+            (item) => technologyIds.indexOf(item.technologyId) !== -1,
+          );
+          console.log('unique', uniqueTech);
+        });
     });
 
     return;
