@@ -128,63 +128,74 @@ export class ProjectsService {
     return results;
   }
 
-  async update(
-    projectId: string,
-    dto: UpdateProjectDto,
-  ): Promise<ProjectResponse> {
-    await this.getOne(projectId);
+  // async update(
+  //   projectId: string,
+  //   dto: UpdateProjectDto,
+  // ): Promise<ProjectResponse> {
+  //   await this.getOne(projectId);
 
-    const { technologyIds, ...rest } = dto;
+  //   const { technologyIds, ...rest } = dto;
 
-    const results = await this.prisma.$transaction(async (transaction) => {
-      await transaction.project.update({
-        where: {
-          id: projectId,
-        },
-        data: {
-          ...rest,
-        },
-      });
+  //   const results = await this.prisma.$transaction(async (transaction) => {
+  //     await transaction.project.update({
+  //       where: {
+  //         id: projectId,
+  //       },
+  //       data: {
+  //         ...rest,
+  //       },
+  //     });
 
-      const unUsedTechnology = await transaction.technologyProject.findMany({
-        where: {
-          projectId,
-          technologyId: { notIn: technologyIds },
-        },
-      });
+  //     const unUsedTechnology = await transaction.technologyProject.findMany({
+  //       where: {
+  //         projectId,
+  //         technologyId: { notIn: technologyIds },
+  //       },
+  //     });
 
-      // await transaction.technologyProject.deleteMany({
-      //   where: {
-      //     AND: [
-      //       {
-      //         projectId,
-      //       },
-      //       {
-      //         technologyId: {
-      //           in: unUsedTechnology.map((item) => item.technologyId),
-      //         },
-      //       },
-      //     ],
-      //   },
-      // });
+  //     await transaction.technologyProject.deleteMany({
+  //       where: {
+  //         AND: [
+  //           {
+  //             projectId,
+  //           },
+  //           {
+  //             technologyId: {
+  //               in: unUsedTechnology.map((item) => item.technologyId),
+  //             },
+  //           },
+  //         ],
+  //       },
+  //     });
 
-      await transaction.technologyProject
-        .findMany({
-          where: {
-            projectId,
-          },
-        })
-        .then(async (data) => {
-          console.log('tech', data);
-          const uniqueTech = data.filter(
-            (item) => technologyIds.indexOf(item.technologyId) !== -1,
-          );
-          console.log('unique', uniqueTech);
-        });
-    });
+  //     await transaction.technologyProject
+  //       .findMany({
+  //         where: {
+  //           projectId,
+  //         },
+  //       })
+  //       .then(async (data) => {
+  //         if (data.length < 0) {
+  //           await transaction.technologyProject.createMany({
+  //             data: technologyIds.map((item) => {
+  //               return {
+  //                 projectId,
+  //                 technologyId: item,
+  //               };
+  //             }),
+  //           });
+  //         } else {
+  //           console.log('dasdadas', data);
 
-    return;
-  }
+  //           const uniqueTech = data.filter(
+  //             (item) => !technologyIds.includes(item.id),
+  //           );
+  //         }
+  //       });
+  //   });
+
+  //   return;
+  // }
 
   async delete(projectId: string): Promise<boolean> {
     await this.getOne(projectId);
@@ -202,18 +213,4 @@ export class ProjectsService {
 
     return result;
   }
-
-  // private async findTechnologyProjectId(id: string): Promise<string> {
-  //   const technologyProject = await this.prisma.technologyProject.findFirst({
-  //     where: {
-  //       projectId: id,
-  //     },
-  //     select: {
-  //       id: true,
-  //     },
-  //   });
-  //   console.log(technologyProject);
-
-  //   return technologyProject.id;
-  // }
 }

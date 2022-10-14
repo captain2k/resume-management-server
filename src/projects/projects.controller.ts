@@ -35,13 +35,13 @@ export class ProjectsController {
     return this.projectService.create(dto);
   }
 
-  @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateProjectDto,
-  ): Promise<ProjectResponse> {
-    return this.projectService.update(id, dto);
-  }
+  // @Put(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() dto: UpdateProjectDto,
+  // ): Promise<ProjectResponse> {
+  //   return this.projectService.update(id, dto);
+  // }
 
   @Delete(':id')
   delete(@Param('id') id: string): Promise<boolean> {
