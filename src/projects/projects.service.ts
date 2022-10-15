@@ -99,14 +99,7 @@ export class ProjectsService {
       let technologies = [];
 
       if (technologyIds.length > 0) {
-        technologies = await transaction.technology.findMany({
-          where: {
-            id: { in: technologyIds },
-          },
-        });
-
-        if (technologies.length !== technologyIds.length)
-          throw new NotFoundException('At least one technology does not exist');
+        technologies = await this.checkExistTechIds(technologyIds);
 
         await transaction.technologyProject.createMany({
           data: technologyIds.map((item) => {
@@ -128,74 +121,96 @@ export class ProjectsService {
     return results;
   }
 
-  // async update(
-  //   projectId: string,
-  //   dto: UpdateProjectDto,
-  // ): Promise<ProjectResponse> {
-  //   await this.getOne(projectId);
+  async update(
+    projectId: string,
+    dto: UpdateProjectDto,
+  ): Promise<ProjectResponse> {
+    await this.getOne(projectId);
 
-  //   const { technologyIds, ...rest } = dto;
+    const { technologyIds, ...rest } = dto;
 
-  //   const results = await this.prisma.$transaction(async (transaction) => {
-  //     await transaction.project.update({
-  //       where: {
-  //         id: projectId,
-  //       },
-  //       data: {
-  //         ...rest,
-  //       },
-  //     });
+    const result = await this.prisma.$transaction(async (transaction) => {
+      const project = await transaction.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          ...rest,
+        },
+      });
 
-  //     const unUsedTechnology = await transaction.technologyProject.findMany({
-  //       where: {
-  //         projectId,
-  //         technologyId: { notIn: technologyIds },
-  //       },
-  //     });
+      let technologies = [];
 
-  //     await transaction.technologyProject.deleteMany({
-  //       where: {
-  //         AND: [
-  //           {
-  //             projectId,
-  //           },
-  //           {
-  //             technologyId: {
-  //               in: unUsedTechnology.map((item) => item.technologyId),
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     });
+      if (technologyIds.length > 0) {
+        technologies = await this.checkExistTechIds(technologyIds);
 
-  //     await transaction.technologyProject
-  //       .findMany({
-  //         where: {
-  //           projectId,
-  //         },
-  //       })
-  //       .then(async (data) => {
-  //         if (data.length < 0) {
-  //           await transaction.technologyProject.createMany({
-  //             data: technologyIds.map((item) => {
-  //               return {
-  //                 projectId,
-  //                 technologyId: item,
-  //               };
-  //             }),
-  //           });
-  //         } else {
-  //           console.log('dasdadas', data);
+        const unUsedTechnology = await transaction.technologyProject.findMany({
+          where: {
+            projectId,
+            technologyId: { notIn: technologyIds },
+          },
+        });
+        if (unUsedTechnology.length > 0) {
+          await transaction.technologyProject.deleteMany({
+            where: {
+              AND: [
+                {
+                  projectId,
+                },
+                {
+                  technologyId: {
+                    in: unUsedTechnology.map((item) => item.technologyId),
+                  },
+                },
+              ],
+            },
+          });
+        }
+        await transaction.technologyProject
+          .findMany({
+            where: {
+              projectId,
+            },
+          })
+          .then(async (data) => {
+            if (data.length === 0) {
+              await transaction.technologyProject.createMany({
+                data: technologyIds.map((item) => {
+                  return {
+                    projectId,
+                    technologyId: item,
+                  };
+                }),
+              });
+            } else {
+              const techIds = data.map((item) => item.technologyId);
+              let unique1 = techIds.filter(
+                (item) => technologyIds.indexOf(item) === -1,
+              );
+              let unique2 = technologyIds.filter(
+                (item) => techIds.indexOf(item) === -1,
+              );
+              const unique = unique1.concat(unique2);
 
-  //           const uniqueTech = data.filter(
-  //             (item) => !technologyIds.includes(item.id),
-  //           );
-  //         }
-  //       });
-  //   });
+              await transaction.technologyProject.createMany({
+                data: unique.map((item) => {
+                  return {
+                    projectId,
+                    technologyId: item,
+                  };
+                }),
+              });
+            }
+          });
+      }
+      return {
+        ...project,
+        technologies,
+      };
+    });
 
-  //   return;
-  // }
+    return result;
+  }
 
   async delete(projectId: string): Promise<boolean> {
     await this.getOne(projectId);
@@ -212,5 +227,17 @@ export class ProjectsService {
     });
 
     return result;
+  }
+
+  private async checkExistTechIds(techIds: string[]) {
+    const technologies = await this.prisma.technology.findMany({
+      where: {
+        id: { in: techIds },
+      },
+    });
+
+    if (technologies.length !== techIds.length)
+      throw new NotFoundException('At least one technology does not exist');
+    return technologies;
   }
 }
