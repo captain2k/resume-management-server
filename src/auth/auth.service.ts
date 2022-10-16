@@ -4,8 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/db/db.service';
-import { RefreshTokenDto, RegisterDto } from './dto/auth.dto';
+import { PrismaService } from 'src/db/prisma.service';
+import { RegisterDto } from './dto/auth.dto';
 import { ResgisterResponse } from './response/register.response';
 import { createHash } from 'crypto';
 import { LoginDto } from './dto/auth.dto';
