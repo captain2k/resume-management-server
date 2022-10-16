@@ -26,3 +26,17 @@ export class RegisterDto {
   @IsEnum(Roles)
   role: Roles;
 }
+
+export class LoginDto {
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
+
+export class RefreshTokenDto {
+  @IsNotEmpty()
+  @IsString()
+  refreshToken: string;
+}

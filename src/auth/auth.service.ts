@@ -5,23 +5,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/db/db.service';
-import { RegisterDto } from './dto/register.dto';
+import { RefreshTokenDto, RegisterDto } from './dto/auth.dto';
 import { ResgisterResponse } from './response/register.response';
 import { createHash } from 'crypto';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dto/auth.dto';
 import { LoginResponse } from './response/login.response';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { Token } from './entities/token.entity';
-
-const select = {
-  id: true,
-  lastName: true,
-  firstName: true,
-  email: true,
-  password: true,
-  role: true,
-};
+import { Token, TokenPayload } from './entities/token.entity';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +36,6 @@ export class AuthService {
         ...registeDto,
         password: this.hashPassword(registeDto.password),
       },
-      select,
     });
 
     return {
@@ -59,7 +49,6 @@ export class AuthService {
       where: {
         email: loginDto.email,
       },
-      select,
     });
 
     if (!user) throw new ConflictException('Your account does not exist');
@@ -74,10 +63,23 @@ export class AuthService {
     };
   }
 
+  async refreshToken(refreshToken: string): Promise<LoginResponse> {
+    const token: TokenPayload = this.verifyToken(refreshToken);
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: token.id,
+      },
+    });
+
+    return {
+      user: new UserEntity(user),
+      token: this.genToken(user),
+    };
+  }
+
   private genToken(dto: Pick<UserEntity, 'id' | 'role'>): Token {
     const { id: userId, role } = dto;
-
-    console.log(this.jwt);
 
     return {
       accessToken: this.jwt.sign({ userId, role }),
@@ -96,5 +98,13 @@ export class AuthService {
   hashPassword(pass: string): string {
     const firstHash = createHash('md5').update(pass).digest('hex');
     return createHash('md5').update(firstHash).digest('hex');
+  }
+
+  verifyToken(token: string): TokenPayload {
+    try {
+      return this.jwt.verify(token);
+    } catch {
+      throw new UnauthorizedException('Refresh token is expired');
+    }
   }
 }

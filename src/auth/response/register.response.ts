@@ -1,3 +1,4 @@
+import { Roles } from '@prisma/client';
 import { Token } from '../entities/token.entity';
 
 class UserEntity {
@@ -7,6 +8,8 @@ class UserEntity {
   lastName: string;
 
   email: string;
+
+  role: Roles;
 }
 
 export class ResgisterResponse {
