@@ -26,4 +26,13 @@ model User {
   firstName String
 
   role Roles @default(HR)
+
+}
+
+model Technology {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  @@map("technology")
 }
