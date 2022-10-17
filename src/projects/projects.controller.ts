@@ -36,10 +36,7 @@ export class ProjectsController {
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateProjectDto,
-  ): Promise<ProjectResponse> {
+  update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
     return this.projectService.update(id, dto);
   }
 

@@ -107,4 +107,19 @@ export class TechnologiesService {
     if (checkTechnologyName)
       throw new ConflictException('Technology name has already existed');
   }
+
+  async checkExistTechIds(
+    techIds: string[],
+    transaction: Prisma.TransactionClient = this.prisma,
+  ) {
+    const technologies = await transaction.technology.findMany({
+      where: {
+        id: { in: techIds },
+      },
+    });
+
+    if (technologies.length !== techIds.length)
+      throw new NotFoundException('At least one technology does not exist');
+    return technologies;
+  }
 }

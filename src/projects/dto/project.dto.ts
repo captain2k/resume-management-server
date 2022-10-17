@@ -28,7 +28,8 @@ export class CreateProjectDto {
   duration: number;
 
   @IsString({ each: true })
-  technologyIds: string[];
+  @IsOptional()
+  technologyIds?: string[];
 }
 
 export class UpdateProjectDto {
