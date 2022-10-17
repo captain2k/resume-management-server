@@ -196,17 +196,8 @@ export class ProjectsService {
   async delete(projectId: string): Promise<boolean> {
     await this.getOne(projectId);
 
-    const result = await this.prisma.$transaction(async (transaction) => {
-      await transaction.technologyProject.deleteMany({
-        where: {
-          projectId,
-        },
-      });
-      await transaction.project.delete({ where: { id: projectId } });
+    await this.prisma.project.delete({ where: { id: projectId } });
 
-      return true;
-    });
-
-    return result;
+    return true;
   }
 }
