@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { GetTechnologiesArgs } from './args/technology.args';
 import { CreateTechnologyDto, UpdateTechnologyDto } from './dto/technology.dto';
 import { TechnologyEntity } from './entities/technology.entity';
@@ -15,6 +16,7 @@ import { GetTechnologiesResponse } from './response/technology.response';
 import { TechnologiesService } from './technologies.service';
 
 @Controller('technologies')
+@ApiTags('Technology')
 export class TechnologiesController {
   constructor(private readonly technologyService: TechnologiesService) {}
 

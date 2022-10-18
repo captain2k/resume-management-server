@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ProjectArgs } from './args/project.args';
 import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
 import { ProjectsService } from './projects.service';
@@ -17,6 +18,7 @@ import {
 } from './response/project.response';
 
 @Controller('projects')
+@ApiTags('Project')
 export class ProjectsController {
   constructor(private readonly projectService: ProjectsService) {}
 
