@@ -65,7 +65,60 @@ export class WorkingHistoriesService {
   }
 
   async create(dto: CreateWorkingHistoryDto): Promise<WorkingHistoryResponse> {
-    return;
+    const { technologyIds, ...rest } = dto;
+
+    return this.prisma.$transaction(async (transaction) => {
+      const workingHistory = await transaction.workingHistory.create({
+        data: rest,
+        include: {
+          project: {
+            include: {
+              technologyProject: {
+                select: {
+                  technology: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const { technologyProject, ...restProject } = workingHistory.project;
+
+      if (Array.isArray(technologyIds) && technologyIds.length > 0) {
+        const technologies = await this.technologyService.checkExistTechIds(
+          technologyIds,
+          transaction,
+        );
+
+        await transaction.workingHistoryTechnology.createMany({
+          data: technologyIds.map((item) => {
+            return {
+              workingHistoryId: workingHistory.id,
+              technologyId: item,
+            };
+          }),
+        });
+
+        return {
+          ...workingHistory,
+          project: {
+            ...restProject,
+            technologies: technologyProject.map((item) => item.technology),
+          },
+          technologies,
+        };
+      }
+
+      return {
+        ...workingHistory,
+        project: {
+          ...restProject,
+          technologies: technologyProject.map((item) => item.technology),
+        },
+        technologies: [],
+      };
+    });
   }
 
   async delete(id: string): Promise<boolean> {
