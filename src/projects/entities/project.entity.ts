@@ -7,4 +7,6 @@ export class ProjectEntity implements Project {
   startDate: Date;
   endDate: Date;
   duration: number;
+  createdAt: Date;
+  updateAt: Date;
 }
