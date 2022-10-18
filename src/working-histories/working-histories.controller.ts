@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { GetWorkingHistoryArgs } from './args/workingHistory.args';
 import {
   CreateWorkingHistoryDto,
@@ -20,6 +21,7 @@ import {
 import { WorkingHistoriesService } from './working-histories.service';
 
 @Controller('working-histories')
+@ApiTags('Working history')
 export class WorkingHistoriesController {
   constructor(
     private readonly workingHistoryService: WorkingHistoriesService,
@@ -54,6 +56,8 @@ export class WorkingHistoriesController {
     @Param('id') id: string,
     @Body() dto: UpdateWorkingHistoryDto,
   ): Promise<WorkingHistoryResponse> {
+    console.log(id);
+
     return this.workingHistoryService.update(id, dto);
   }
 }
