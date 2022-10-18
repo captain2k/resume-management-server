@@ -56,8 +56,6 @@ export class WorkingHistoriesController {
     @Param('id') id: string,
     @Body() dto: UpdateWorkingHistoryDto,
   ): Promise<WorkingHistoryResponse> {
-    console.log(id);
-
     return this.workingHistoryService.update(id, dto);
   }
 }

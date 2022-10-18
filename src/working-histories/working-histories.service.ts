@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
+import { TechnologiesService } from 'src/technologies/technologies.service';
 import { GetWorkingHistoryArgs } from './args/workingHistory.args';
 import {
   CreateWorkingHistoryDto,
@@ -12,10 +13,49 @@ import {
 
 @Injectable()
 export class WorkingHistoriesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly technologyService: TechnologiesService,
+  ) {}
 
   async getOne(id: string): Promise<WorkingHistoryResponse> {
-    return;
+    const workingHistory = await this.prisma.workingHistory.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        project: {
+          include: {
+            technologyProject: {
+              select: {
+                technology: true,
+              },
+            },
+          },
+        },
+        workingHistoryTechnology: {
+          select: {
+            technology: true,
+          },
+        },
+      },
+    });
+
+    if (!workingHistory)
+      throw new NotFoundException('Working history does not exist');
+
+    const { technologyProject, ...rest } = workingHistory.project;
+    const { workingHistoryTechnology, ...restWorkingHistory } = workingHistory;
+    console.log(technologyProject);
+
+    return {
+      ...restWorkingHistory,
+      project: {
+        ...rest,
+        technologies: technologyProject.map((item) => item.technology),
+      },
+      technologies: workingHistoryTechnology.map((item) => item.technology),
+    };
   }
 
   async getMany(
