@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateWorkingHistoryDto {
@@ -20,9 +20,19 @@ export class CreateWorkingHistoryDto {
 
   @IsString({ each: true })
   @IsOptional()
-  technologyIds: string[];
+  technologyIds?: string[];
 }
 
-export class UpdateWorkingHistoryDto extends PartialType(
-  CreateWorkingHistoryDto,
-) {}
+export class UpdateWorkingHistoryDto {
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @IsString()
+  @IsOptional()
+  responsibilities?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  technologyIds?: string[];
+}

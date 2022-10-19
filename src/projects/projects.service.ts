@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 import { TechnologiesService } from 'src/technologies/technologies.service';
@@ -30,7 +34,7 @@ export class ProjectsService {
       },
     });
 
-    if (!project) throw new BadRequestException('Project does not exist');
+    if (!project) throw new NotFoundException('Project does not exist');
 
     const { technologyProject, ...rest } = project;
 

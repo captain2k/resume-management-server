@@ -9,15 +9,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { GetWorkingHistoryArgs } from './args/workingHistory.args';
+import { GetWorkingHistoryArgs } from './args/working-history.args';
 import {
   CreateWorkingHistoryDto,
   UpdateWorkingHistoryDto,
-} from './dto/workingHistory.dto';
+} from './dto/working-history.dto';
 import {
   GetWorkingHistoryRespose,
   WorkingHistoryResponse,
-} from './response/workingHistory.response';
+} from './response/working-history.response';
 import { WorkingHistoriesService } from './working-histories.service';
 
 @Controller('working-histories')
