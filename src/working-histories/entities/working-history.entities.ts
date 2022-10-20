@@ -7,5 +7,4 @@ export class WorkingHistoryEntity implements WorkingHistory {
   createdAt: Date;
   updateAt: Date;
   projectId: string;
-  userId: string;
 }

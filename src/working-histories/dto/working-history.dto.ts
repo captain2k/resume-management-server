@@ -1,4 +1,3 @@
-import { PartialType, PickType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateWorkingHistoryDto {
@@ -13,10 +12,6 @@ export class CreateWorkingHistoryDto {
   @IsString()
   @IsNotEmpty()
   projectId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
 
   @IsString({ each: true })
   @IsOptional()

@@ -23,14 +23,14 @@ ADD COLUMN     "updateAt" TIMESTAMP(3) NOT NULL;
 DROP TABLE "User";
 
 -- CreateTable
-CREATE TABLE "users" (
+CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -41,7 +41,6 @@ CREATE TABLE "working_history" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "projectId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
 
     CONSTRAINT "working_history_pkey" PRIMARY KEY ("id")
 );
@@ -58,16 +57,13 @@ CREATE TABLE "working_history-technology" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "working_history-technology_technologyId_workingHistoryId_key" ON "working_history-technology"("technologyId", "workingHistoryId");
 
 -- AddForeignKey
 ALTER TABLE "working_history" ADD CONSTRAINT "working_history_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "working_history" ADD CONSTRAINT "working_history_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "working_history-technology" ADD CONSTRAINT "working_history-technology_technologyId_fkey" FOREIGN KEY ("technologyId") REFERENCES "technology"("id") ON DELETE CASCADE ON UPDATE CASCADE;
