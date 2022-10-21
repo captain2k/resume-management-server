@@ -16,7 +16,7 @@ export class CreateWorkingHistoryDto {
 
   @IsString()
   @IsNotEmpty()
-  userId: string;
+  profileId: string;
 
   @IsString({ each: true })
   @IsOptional()

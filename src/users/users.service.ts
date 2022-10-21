@@ -6,7 +6,7 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getOne(id: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },

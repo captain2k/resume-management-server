@@ -8,6 +8,9 @@ import { WorkingHistoriesModule } from './working-histories/working-histories.mo
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
+import { ProfilesService } from './profiles/profiles.service';
+import { ProfilesController } from './profiles/profiles.controller';
+import { ProfilesModule } from './profiles/profiles.module';
 
 @Module({
   imports: [
@@ -16,8 +19,9 @@ import { UsersModule } from './users/users.module';
     ProjectsModule,
     WorkingHistoriesModule,
     UsersModule,
+    ProfilesModule,
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService],
+  controllers: [AppController, UsersController, ProfilesController],
+  providers: [AppService, UsersService, ProfilesService],
 })
 export class AppModule {}

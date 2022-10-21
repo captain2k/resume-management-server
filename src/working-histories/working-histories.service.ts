@@ -118,9 +118,8 @@ export class WorkingHistoriesService {
     const { technologyIds, ...rest } = dto;
 
     return this.prisma.$transaction(async (transaction) => {
-      // Check project, user exist
+      // Check project exist
       await this.projectService.getOne(rest.projectId);
-      await this.usersService.getOne(rest.userId);
 
       const workingHistory = await transaction.workingHistory.create({
         data: rest,
