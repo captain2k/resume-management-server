@@ -12,9 +12,14 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
+  id    String  @id @default(uuid())
   email String  @unique
   name  String?
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@map("user")
 }
 
 model Technology {
@@ -22,7 +27,11 @@ model Technology {
 
   name String @unique
 
-  technologyProject TechnologyProject[]
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  technologyProject        TechnologyProject[]
+  workingHistoryTechnology WorkingHistoryTechnology[]
 
   @@map("technology")
 }
@@ -36,20 +45,58 @@ model Project {
   endDate     DateTime?
   duration    Int
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
   technologyProject TechnologyProject[]
+  workingHistory    WorkingHistory[]
 
   @@map("project")
+}
+
+model WorkingHistory {
+  id String @id @default(uuid())
+
+  role             String
+  responsibilities String? @db.Text
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  workingHistoryTechnology WorkingHistoryTechnology[]
+
+  @@map("working_history")
 }
 
 model TechnologyProject {
   id String @id @default(uuid())
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
   technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
   technologyId String
-
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String
 
   @@unique([technologyId, projectId])
   @@map("technology-project")
+}
+
+model WorkingHistoryTechnology {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  technologyId     String
+  technology       Technology     @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+  workingHistoryId String
+  workingHistory   WorkingHistory @relation(fields: [workingHistoryId], references: [id], onDelete: Cascade)
+
+  @@unique([technologyId, workingHistoryId])
+  @@map("working_history-technology")
 }
