@@ -1,4 +1,3 @@
-import { OmitType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateProfileDto {
@@ -8,7 +7,11 @@ export class CreateProfileDto {
 
   @IsString()
   @IsOptional()
-  introduction: string;
+  introduction?: string;
 }
 
-export class UpdateProfileDto extends OmitType(CreateProfileDto, ['userId']) {}
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  introduction?: string;
+}

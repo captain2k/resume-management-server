@@ -47,12 +47,12 @@ CREATE TABLE "working_history" (
 );
 
 -- CreateTable
-CREATE TABLE "prifile" (
+CREATE TABLE "profile" (
     "id" TEXT NOT NULL,
-    "introduction" TEXT NOT NULL,
+    "introduction" TEXT,
     "userId" TEXT NOT NULL,
 
-    CONSTRAINT "prifile_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "profile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -93,10 +93,10 @@ CREATE UNIQUE INDEX "working_history-technology_technologyId_workingHistoryId_ke
 ALTER TABLE "working_history" ADD CONSTRAINT "working_history_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "working_history" ADD CONSTRAINT "working_history_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "prifile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "working_history" ADD CONSTRAINT "working_history_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "prifile" ADD CONSTRAINT "prifile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "profile" ADD CONSTRAINT "profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "technology-project" ADD CONSTRAINT "technology-project_technologyId_fkey" FOREIGN KEY ("technologyId") REFERENCES "technology"("id") ON DELETE CASCADE ON UPDATE CASCADE;

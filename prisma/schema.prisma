@@ -78,14 +78,14 @@ model WorkingHistory {
 model Profile {
   id String @id @default(uuid())
 
-  introduction String @db.Text
+  introduction String? @db.Text
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
   workingHistory WorkingHistory[]
 
-  @@map("prifile")
+  @@map("profile")
 }
 
 model TechnologyProject {

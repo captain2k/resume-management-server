@@ -1,39 +1,46 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import { ProfileArgs } from './args/profile.args';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto';
+import { ProfileEntity } from './entities/profile.entity';
 import {
   GetProfileResponse,
   ProfileResponse,
 } from './response/profile.response';
 
-@Injectable()
-export class ProfilesService {
-  constructor(private readonly prisma: PrismaService) {}
-
-  async getOne(id: string): Promise<ProfileResponse> {
-    const profile = await this.prisma.profile.findUnique({
-      where: { id },
-      include: {
-        workingHistory: {
-          include: {
-            project: {
-              include: {
-                technologyProject: {
-                  select: {
-                    technology: true,
-                  },
-                },
-              },
-            },
-            workingHistoryTechnology: {
-              select: {
-                technology: true,
-              },
+const include = Prisma.validator<Prisma.ProfileInclude>()({
+  workingHistory: {
+    include: {
+      project: {
+        include: {
+          technologyProject: {
+            select: {
+              technology: true,
             },
           },
         },
       },
+      workingHistoryTechnology: {
+        select: {
+          technology: true,
+        },
+      },
+    },
+  },
+});
+@Injectable()
+export class ProfilesService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
+
+  async getOne(id: string): Promise<ProfileResponse> {
+    const profile = await this.prisma.profile.findUnique({
+      where: { id },
+      include: include,
     });
 
     if (!profile) throw new NotFoundException('Profile does not exist');
@@ -65,26 +72,7 @@ export class ProfilesService {
       this.prisma.profile.findMany({
         skip: offset,
         take: limit,
-        include: {
-          workingHistory: {
-            include: {
-              project: {
-                include: {
-                  technologyProject: {
-                    select: {
-                      technology: true,
-                    },
-                  },
-                },
-              },
-              workingHistoryTechnology: {
-                select: {
-                  technology: true,
-                },
-              },
-            },
-          },
-        },
+        include,
       }),
     ]);
 
@@ -115,15 +103,69 @@ export class ProfilesService {
     };
   }
 
-  async create(dto: CreateProfileDto) {
-    return;
+  async create(dto: CreateProfileDto): Promise<ProfileEntity> {
+    await this.usersService.getOne(dto.userId);
+
+    const profile = await this.prisma.profile.create({
+      data: dto,
+    });
+
+    return profile;
   }
 
-  async update(id: string, dto: UpdateProfileDto) {
-    return;
+  async update(id: string, dto: UpdateProfileDto): Promise<ProfileEntity> {
+    await this.getOne(id);
+
+    const profile = await this.prisma.profile.update({
+      where: {
+        id,
+      },
+      data: dto,
+    });
+
+    return profile;
   }
 
-  async delete(id: string) {
-    return;
+  async delete(id: string): Promise<boolean> {
+    await this.getOne(id);
+
+    await this.prisma.profile.delete({
+      where: { id },
+    });
+    return true;
+  }
+
+  async clone(profileId: string) {
+    return await this.prisma.$transaction(async (transaction) => {
+      const oldProfile = await transaction.profile.findUnique({
+        where: {
+          id: profileId,
+        },
+        include: {
+          workingHistory: true,
+        },
+      });
+
+      const cloneProfile = await transaction.profile.create({
+        data: {
+          userId: oldProfile.userId,
+          introduction: oldProfile.introduction,
+        },
+      });
+
+      // const workingHistory = await transaction.workingHistory.createMany({
+      //   data: oldProfile.workingHistory.map((item) => {
+      //     const { id: rootId, profileId: rootProfileId, ...rest } = item;
+      //     return {
+      //       ...rest,
+      //       profileId,
+      //     };
+      //   }),
+      // });
+
+      return {
+        ...cloneProfile,
+      };
+    });
   }
 }

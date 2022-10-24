@@ -8,6 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ProfileArgs } from './args/profile.args';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto';
 import { ProfilesService } from './profiles.service';
@@ -17,6 +18,7 @@ import {
 } from './response/profile.response';
 
 @Controller('profiles')
+@ApiTags('Profiles')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 
@@ -37,11 +39,18 @@ export class ProfilesController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateProfileDto) {
+    console.log(dto);
+
     return this.profilesService.update(id, dto);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.profilesService.delete(id);
+  }
+
+  @Post(':id')
+  clone(@Param('id') id: string) {
+    return this.profilesService.clone(id);
   }
 }
