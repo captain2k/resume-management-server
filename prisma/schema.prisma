@@ -84,6 +84,8 @@ model Profile {
   user   User   @relation(fields: [userId], references: [id])
 
   workingHistory WorkingHistory[]
+
+  @@map("prifile")
 }
 
 model TechnologyProject {
