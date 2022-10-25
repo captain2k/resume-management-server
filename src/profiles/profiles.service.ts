@@ -46,7 +46,7 @@ export class ProfilesService {
 
     if (!profile) throw new NotFoundException('Profile does not exist');
 
-    const formatedWorkingHistory = profile.workingHistories.map((item) => {
+    const formatedWorkingHistories = profile.workingHistories.map((item) => {
       const { project, workingHistoryTechnologies, ...restWorkingHistory } =
         item;
       const { technologyProjects, ...restProject } = project;
@@ -62,7 +62,7 @@ export class ProfilesService {
 
     return {
       ...profile,
-      workingHistory: formatedWorkingHistory,
+      workingHistory: formatedWorkingHistories,
     };
   }
 
@@ -78,7 +78,7 @@ export class ProfilesService {
       }),
     ]);
 
-    const formatedProfile = profiles.map((item) => {
+    const formatedProfiles = profiles.map((item) => {
       const { workingHistories, ...rest } = item;
 
       return {
@@ -102,7 +102,7 @@ export class ProfilesService {
     });
 
     return {
-      data: formatedProfile,
+      data: formatedProfiles,
       pagination: {
         limit,
         offset,
@@ -144,8 +144,8 @@ export class ProfilesService {
   }
 
   async clone(profileId: string): Promise<ProfileEntity> {
-    return await this.prisma.$transaction(async (transaction) => {
-      const oldProfile = await transaction.profile.findUnique({
+    return this.prisma.$transaction(async (transaction) => {
+      const rootProfile = await transaction.profile.findUnique({
         where: {
           id: profileId,
         },
@@ -156,14 +156,14 @@ export class ProfilesService {
 
       const cloneProfile = await transaction.profile.create({
         data: {
-          userId: oldProfile.userId,
-          introduction: oldProfile.introduction,
+          userId: rootProfile.userId,
+          introduction: rootProfile.introduction,
         },
       });
 
       await transaction.workingHistory.createMany({
-        data: oldProfile.workingHistories.map((item) => {
-          const { id: rootId, profileId: rootProfileId, ...rest } = item;
+        data: rootProfile.workingHistories.map((item) => {
+          const { id: rootId, ...rest } = item;
           return {
             ...rest,
             profileId: cloneProfile.id,
