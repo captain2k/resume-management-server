@@ -12,7 +12,8 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(uuid())
+  id String @id @default(uuid())
+
   email String  @unique
   name  String?
 
@@ -32,8 +33,8 @@ model Technology {
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  technologyProject        TechnologyProject[]
-  workingHistoryTechnology WorkingHistoryTechnology[]
+  technologyProjects         TechnologyProject[]
+  workingHistoryTechnologies WorkingHistoryTechnology[]
 
   @@map("technology")
 }
@@ -50,8 +51,8 @@ model Project {
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  technologyProject TechnologyProject[]
-  workingHistory    WorkingHistory[]
+  technologyProjects TechnologyProject[]
+  workingHistories   WorkingHistory[]
 
   @@map("project")
 }
@@ -70,7 +71,7 @@ model WorkingHistory {
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id])
 
-  workingHistoryTechnology WorkingHistoryTechnology[]
+  workingHistoryTechnologies WorkingHistoryTechnology[]
 
   @@map("working_history")
 }
@@ -83,7 +84,7 @@ model Profile {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  workingHistory WorkingHistory[]
+  workingHistories WorkingHistory[]
 
   @@map("profile")
 }

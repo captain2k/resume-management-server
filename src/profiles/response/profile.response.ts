@@ -6,6 +6,6 @@ export class ProfileResponse extends ProfileEntity {
   workingHistory: WorkingHistoryResponse[];
 }
 
-export class GetProfileResponse extends CollectionResponse<ProfileResponse> {
+export class GetProfilesResponse extends CollectionResponse<ProfileResponse> {
   data: ProfileResponse[];
 }

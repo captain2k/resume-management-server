@@ -11,44 +11,48 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ProfileArgs } from './args/profile.args';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto';
+import { ProfileEntity } from './entities/profile.entity';
 import { ProfilesService } from './profiles.service';
 import {
-  GetProfileResponse,
+  GetProfilesResponse,
   ProfileResponse,
 } from './response/profile.response';
 
 @Controller('profiles')
-@ApiTags('Profiles')
+@ApiTags('Profile')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  constructor(private readonly service: ProfilesService) {}
 
   @Get(':id')
   getOne(@Param('id') id: string): Promise<ProfileResponse> {
-    return this.profilesService.getOne(id);
+    return this.service.getOne(id);
   }
 
   @Get()
-  getMany(@Query() query: ProfileArgs): Promise<GetProfileResponse> {
-    return this.profilesService.getMany(query);
+  getMany(@Query() query: ProfileArgs): Promise<GetProfilesResponse> {
+    return this.service.getMany(query);
   }
 
   @Post()
-  create(@Body() dto: CreateProfileDto) {
-    return this.profilesService.create(dto);
+  create(@Body() dto: CreateProfileDto): Promise<ProfileEntity> {
+    return this.service.create(dto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateProfileDto) {
-    return this.profilesService.update(id, dto);
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateProfileDto,
+  ): Promise<ProfileEntity> {
+    return this.service.update(id, dto);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string): Promise<boolean> {
-    return this.profilesService.delete(id);
+    return this.service.delete(id);
   }
 
-  @Post(':id')
-  clone(@Param('id') id: string) {
-    return this.profilesService.clone(id);
+  @Post('clone/:id')
+  clone(@Param('id') id: string): Promise<ProfileEntity> {
+    return this.service.clone(id);
   }
 }

@@ -6,23 +6,23 @@ import { ProfileArgs } from './args/profile.args';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto';
 import { ProfileEntity } from './entities/profile.entity';
 import {
-  GetProfileResponse,
+  GetProfilesResponse,
   ProfileResponse,
 } from './response/profile.response';
 
 const include = Prisma.validator<Prisma.ProfileInclude>()({
-  workingHistory: {
+  workingHistories: {
     include: {
       project: {
         include: {
-          technologyProject: {
+          technologyProjects: {
             select: {
               technology: true,
             },
           },
         },
       },
-      workingHistoryTechnology: {
+      workingHistoryTechnologies: {
         select: {
           technology: true,
         },
@@ -30,6 +30,7 @@ const include = Prisma.validator<Prisma.ProfileInclude>()({
     },
   },
 });
+
 @Injectable()
 export class ProfilesService {
   constructor(
@@ -45,26 +46,27 @@ export class ProfilesService {
 
     if (!profile) throw new NotFoundException('Profile does not exist');
 
-    const formatProfile = profile.workingHistory.map((item) => {
-      const { project, workingHistoryTechnology, ...restItem } = item;
-      const { technologyProject, ...restProject } = project;
+    const formatedWorkingHistory = profile.workingHistories.map((item) => {
+      const { project, workingHistoryTechnologies, ...restWorkingHistory } =
+        item;
+      const { technologyProjects, ...restProject } = project;
       return {
-        ...restItem,
+        ...restWorkingHistory,
         project: {
           ...restProject,
-          technologies: technologyProject.map((item) => item.technology),
+          technologies: technologyProjects.map((item) => item.technology),
         },
-        technologies: workingHistoryTechnology.map((item) => item.technology),
+        technologies: workingHistoryTechnologies.map((item) => item.technology),
       };
     });
 
     return {
       ...profile,
-      workingHistory: formatProfile,
+      workingHistory: formatedWorkingHistory,
     };
   }
 
-  async getMany(query: ProfileArgs): Promise<GetProfileResponse> {
+  async getMany(query: ProfileArgs): Promise<GetProfilesResponse> {
     const { limit, offset } = query;
 
     const [total, profiles] = await this.prisma.$transaction([
@@ -76,25 +78,31 @@ export class ProfilesService {
       }),
     ]);
 
-    let formatProfile = [];
+    const formatedProfile = profiles.map((item) => {
+      const { workingHistories, ...rest } = item;
 
-    profiles.forEach((item) => {
-      formatProfile = item.workingHistory.map((item) => {
-        const { project, workingHistoryTechnology, ...restItem } = item;
-        const { technologyProject, ...restProject } = project;
-        return {
-          ...restItem,
-          project: {
-            ...restProject,
-            technologies: technologyProject.map((item) => item.technology),
-          },
-          technologies: workingHistoryTechnology.map((item) => item.technology),
-        };
-      });
+      return {
+        ...rest,
+        workingHistory: workingHistories.map((item) => {
+          const { project, workingHistoryTechnologies, ...restWorkingHistory } =
+            item;
+          const { technologyProjects, ...restProject } = project;
+          return {
+            ...restWorkingHistory,
+            project: {
+              ...restProject,
+              technologies: technologyProjects.map((item) => item.technology),
+            },
+            technologies: workingHistoryTechnologies.map(
+              (item) => item.technology,
+            ),
+          };
+        }),
+      };
     });
 
     return {
-      data: formatProfile,
+      data: formatedProfile,
       pagination: {
         limit,
         offset,
@@ -142,7 +150,7 @@ export class ProfilesService {
           id: profileId,
         },
         include: {
-          workingHistory: true,
+          workingHistories: true,
         },
       });
 
@@ -154,11 +162,11 @@ export class ProfilesService {
       });
 
       await transaction.workingHistory.createMany({
-        data: oldProfile.workingHistory.map((item) => {
+        data: oldProfile.workingHistories.map((item) => {
           const { id: rootId, profileId: rootProfileId, ...rest } = item;
           return {
             ...rest,
-            profileId,
+            profileId: cloneProfile.id,
           };
         }),
       });
