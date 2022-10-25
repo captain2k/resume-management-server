@@ -39,13 +39,11 @@ export class ProfilesController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateProfileDto) {
-    console.log(dto);
-
     return this.profilesService.update(id, dto);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id') id: string): Promise<boolean> {
     return this.profilesService.delete(id);
   }
 

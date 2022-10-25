@@ -135,7 +135,7 @@ export class ProfilesService {
     return true;
   }
 
-  async clone(profileId: string) {
+  async clone(profileId: string): Promise<ProfileEntity> {
     return await this.prisma.$transaction(async (transaction) => {
       const oldProfile = await transaction.profile.findUnique({
         where: {
@@ -153,19 +153,17 @@ export class ProfilesService {
         },
       });
 
-      // const workingHistory = await transaction.workingHistory.createMany({
-      //   data: oldProfile.workingHistory.map((item) => {
-      //     const { id: rootId, profileId: rootProfileId, ...rest } = item;
-      //     return {
-      //       ...rest,
-      //       profileId,
-      //     };
-      //   }),
-      // });
+      await transaction.workingHistory.createMany({
+        data: oldProfile.workingHistory.map((item) => {
+          const { id: rootId, profileId: rootProfileId, ...rest } = item;
+          return {
+            ...rest,
+            profileId,
+          };
+        }),
+      });
 
-      return {
-        ...cloneProfile,
-      };
+      return cloneProfile;
     });
   }
 }
