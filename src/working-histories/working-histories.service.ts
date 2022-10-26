@@ -30,14 +30,14 @@ export class WorkingHistoriesService {
       include: {
         project: {
           include: {
-            technologyProject: {
+            technologyProjects: {
               select: {
                 technology: true,
               },
             },
           },
         },
-        workingHistoryTechnology: {
+        workingHistoryTechnologies: {
           select: {
             technology: true,
           },
@@ -48,16 +48,17 @@ export class WorkingHistoriesService {
     if (!workingHistory)
       throw new NotFoundException('Working history does not exist');
 
-    const { technologyProject, ...rest } = workingHistory.project;
-    const { workingHistoryTechnology, ...restWorkingHistory } = workingHistory;
+    const { technologyProjects, ...rest } = workingHistory.project;
+    const { workingHistoryTechnologies, ...restWorkingHistory } =
+      workingHistory;
 
     return {
       ...restWorkingHistory,
       project: {
         ...rest,
-        technologies: technologyProject.map((item) => item.technology),
+        technologies: technologyProjects.map((item) => item.technology),
       },
-      technologies: workingHistoryTechnology.map((item) => item.technology),
+      technologies: workingHistoryTechnologies.map((item) => item.technology),
     };
   }
 
@@ -74,14 +75,14 @@ export class WorkingHistoriesService {
         include: {
           project: {
             include: {
-              technologyProject: {
+              technologyProjects: {
                 select: {
                   technology: true,
                 },
               },
             },
           },
-          workingHistoryTechnology: {
+          workingHistoryTechnologies: {
             select: {
               technology: true,
             },
@@ -91,16 +92,16 @@ export class WorkingHistoriesService {
     ]);
 
     const formatWorkingHistories = workingHistories.map((item) => {
-      const { technologyProject, ...rest } = item.project;
-      const { workingHistoryTechnology, ...restWorkingHistory } = item;
+      const { technologyProjects, ...rest } = item.project;
+      const { workingHistoryTechnologies, ...restWorkingHistory } = item;
 
       return {
         ...restWorkingHistory,
         project: {
           ...rest,
-          technologies: technologyProject.map((item) => item.technology),
+          technologies: technologyProjects.map((item) => item.technology),
         },
-        technologies: workingHistoryTechnology.map((item) => item.technology),
+        technologies: workingHistoryTechnologies.map((item) => item.technology),
       };
     });
 
@@ -118,16 +119,15 @@ export class WorkingHistoriesService {
     const { technologyIds, ...rest } = dto;
 
     return this.prisma.$transaction(async (transaction) => {
-      // Check project, user exist
+      // Check project exist
       await this.projectService.getOne(rest.projectId);
-      await this.usersService.getOne(rest.userId);
 
       const workingHistory = await transaction.workingHistory.create({
         data: rest,
         include: {
           project: {
             include: {
-              technologyProject: {
+              technologyProjects: {
                 select: {
                   technology: true,
                 },
@@ -137,7 +137,7 @@ export class WorkingHistoriesService {
         },
       });
 
-      const { technologyProject, ...restProject } = workingHistory.project;
+      const { technologyProjects, ...restProject } = workingHistory.project;
 
       if (Array.isArray(technologyIds) && technologyIds.length > 0) {
         const technologies = await this.technologyService.checkExistTechIds(
@@ -159,7 +159,7 @@ export class WorkingHistoriesService {
           ...workingHistory,
           project: {
             ...restProject,
-            technologies: technologyProject.map((item) => item.technology),
+            technologies: technologyProjects.map((item) => item.technology),
           },
           technologies,
         };
@@ -169,7 +169,7 @@ export class WorkingHistoriesService {
         ...workingHistory,
         project: {
           ...restProject,
-          technologies: technologyProject.map((item) => item.technology),
+          technologies: technologyProjects.map((item) => item.technology),
         },
         technologies: [],
       };
@@ -213,7 +213,7 @@ export class WorkingHistoriesService {
             include: {
               technology: {
                 include: {
-                  workingHistoryTechnology: {
+                  workingHistoryTechnologies: {
                     select: {
                       technology: true,
                     },
