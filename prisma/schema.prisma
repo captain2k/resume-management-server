@@ -94,7 +94,7 @@ model Profile {
 model ProfileTechnology {
   id String @id @default(uuid())
 
-  yoe Decimal
+  yoe Float
 
   profileId    String
   profile      Profile    @relation(fields: [profileId], references: [id])

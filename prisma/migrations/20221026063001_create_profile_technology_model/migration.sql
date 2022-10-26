@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "ProfileTechnology" (
     "id" TEXT NOT NULL,
-    "yoe" DECIMAL(65,30) NOT NULL,
+    "yoe" DOUBLE PRECISION NOT NULL,
     "profileId" TEXT NOT NULL,
     "technologyId" TEXT NOT NULL,
 

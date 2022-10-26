@@ -1,7 +1,10 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ProfileTechnologyEntity } from '../entities/profile-technology.entity';
 
-export class CreateProfileTechnologyDto {
+export class CreateProfileTechnologyDto
+  implements Omit<ProfileTechnologyEntity, 'id'>
+{
   @IsNumber()
   @IsNotEmpty()
   yoe: number;
@@ -15,6 +18,14 @@ export class CreateProfileTechnologyDto {
   technologyId: string;
 }
 
-export class UpdateProfileTechnologyDto extends PartialType(
-  CreateProfileTechnologyDto,
-) {}
+export class UpdateProfileTechnologyDto
+  implements Partial<Omit<ProfileTechnologyEntity, 'profileId' | 'id'>>
+{
+  @IsString()
+  @IsOptional()
+  technologyId?: string;
+
+  @IsNumber()
+  @IsOptional()
+  yoe?: number;
+}
