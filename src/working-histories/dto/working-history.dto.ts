@@ -13,6 +13,10 @@ export class CreateWorkingHistoryDto {
   @IsNotEmpty()
   projectId: string;
 
+  @IsString()
+  @IsNotEmpty()
+  profileId: string;
+
   @IsString({ each: true })
   @IsOptional()
   technologyIds?: string[];

@@ -26,7 +26,7 @@ export class ProjectsService {
         id: projectId,
       },
       include: {
-        technologyProject: {
+        technologyProjects: {
           select: {
             technology: true,
           },
@@ -36,11 +36,11 @@ export class ProjectsService {
 
     if (!project) throw new NotFoundException('Project does not exist');
 
-    const { technologyProject, ...rest } = project;
+    const { technologyProjects, ...rest } = project;
 
     return {
       ...rest,
-      technologies: technologyProject.map((item) => item.technology),
+      technologies: technologyProjects.map((item) => item.technology),
     };
   }
 
@@ -63,7 +63,7 @@ export class ProjectsService {
         skip: offset,
         take: limit,
         include: {
-          technologyProject: {
+          technologyProjects: {
             select: {
               technology: true,
             },
@@ -73,10 +73,10 @@ export class ProjectsService {
     ]);
 
     const projectList = projects.map((item) => {
-      const { technologyProject, ...rest } = item;
+      const { technologyProjects, ...rest } = item;
       return {
         ...rest,
-        technologies: technologyProject.map((item) => item.technology),
+        technologies: technologyProjects.map((item) => item.technology),
       };
     });
 
