@@ -15,27 +15,12 @@ import {
   UpdateProfileTechnologyDto,
 } from './dto/profile-technology.dto';
 import { ProfileTechnologiesService } from './profile-technologies.service';
-import {
-  GetProfileTechnologiesResponse,
-  ProfileTechnologyResponse,
-} from './response/profile-technology.response';
+import { ProfileTechnologyResponse } from './response/profile-technology.response';
 
 @Controller('profile-technologies')
 @ApiTags('Profile technology')
 export class ProfileTechnologiesController {
   constructor(private readonly service: ProfileTechnologiesService) {}
-
-  @Get(':id')
-  getOne(@Param('id') id: string): Promise<ProfileTechnologyResponse> {
-    return this.service.getOne(id);
-  }
-
-  @Get()
-  getMany(
-    @Query() query: ProfileTechnologyArgs,
-  ): Promise<GetProfileTechnologiesResponse> {
-    return this.service.getMany(query);
-  }
 
   @Post()
   create(

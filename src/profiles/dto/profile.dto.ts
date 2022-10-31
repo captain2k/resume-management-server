@@ -1,7 +1,9 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ProfileEntity } from '../entities/profile.entity';
 
-export class CreateProfileDto implements Omit<ProfileEntity, 'id'> {
+export class CreateProfileDto
+  implements Omit<ProfileEntity, 'id' | 'createdAt' | 'updateAt'>
+{
   @IsString()
   @IsNotEmpty()
   userId: string;

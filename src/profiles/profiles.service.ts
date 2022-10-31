@@ -29,6 +29,11 @@ const include = Prisma.validator<Prisma.ProfileInclude>()({
       },
     },
   },
+  profileTechnology: {
+    select: {
+      technology: true,
+    },
+  },
 });
 
 @Injectable()
@@ -46,7 +51,9 @@ export class ProfilesService {
 
     if (!profile) throw new NotFoundException('Profile does not exist');
 
-    const formatedWorkingHistories = profile.workingHistories.map((item) => {
+    const { workingHistories, profileTechnology, ...rest } = profile;
+
+    const formatedWorkingHistories = workingHistories.map((item) => {
       const { project, workingHistoryTechnologies, ...restWorkingHistory } =
         item;
       const { technologyProjects, ...restProject } = project;
@@ -61,8 +68,9 @@ export class ProfilesService {
     });
 
     return {
-      ...profile,
-      workingHistory: formatedWorkingHistories,
+      ...rest,
+      workingHistories: formatedWorkingHistories,
+      technologies: profileTechnology.map((item) => item.technology),
     };
   }
 
@@ -79,11 +87,11 @@ export class ProfilesService {
     ]);
 
     const formatedProfiles = profiles.map((item) => {
-      const { workingHistories, ...rest } = item;
+      const { workingHistories, profileTechnology, ...rest } = item;
 
       return {
         ...rest,
-        workingHistory: workingHistories.map((item) => {
+        workingHistories: workingHistories.map((item) => {
           const { project, workingHistoryTechnologies, ...restWorkingHistory } =
             item;
           const { technologyProjects, ...restProject } = project;
@@ -98,6 +106,7 @@ export class ProfilesService {
             ),
           };
         }),
+        technologies: profileTechnology.map((item) => item.technology),
       };
     });
 

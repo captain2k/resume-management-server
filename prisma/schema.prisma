@@ -82,6 +82,9 @@ model Profile {
 
   introduction String? @db.Text
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
@@ -95,6 +98,9 @@ model ProfileTechnology {
   id String @id @default(uuid())
 
   yoe Float
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 
   profileId    String
   profile      Profile    @relation(fields: [profileId], references: [id])

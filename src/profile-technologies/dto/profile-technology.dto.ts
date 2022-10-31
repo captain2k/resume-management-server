@@ -2,7 +2,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ProfileTechnologyEntity } from '../entities/profile-technology.entity';
 
 export class CreateProfileTechnologyDto
-  implements Omit<ProfileTechnologyEntity, 'id'>
+  implements Omit<ProfileTechnologyEntity, 'id' | 'createdAt' | 'updateAt'>
 {
   @IsNumber()
   @IsNotEmpty()
@@ -18,12 +18,14 @@ export class CreateProfileTechnologyDto
 }
 
 export class UpdateProfileTechnologyDto
-  implements Partial<Omit<ProfileTechnologyEntity, 'profileId' | 'id'>>
+  implements
+    Partial<
+      Omit<
+        ProfileTechnologyEntity,
+        'profileId' | 'id' | 'createdAt' | 'updateAt'
+      >
+    >
 {
-  @IsString()
-  @IsOptional()
-  technologyId?: string;
-
   @IsNumber()
   @IsOptional()
   yoe?: number;
