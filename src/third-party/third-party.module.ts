@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { AzureService } from './azure.service';
 
-@Module({})
+@Module({
+  providers: [AzureService],
+  exports: [AzureService],
+})
 export class ThirdPartyModule {}
