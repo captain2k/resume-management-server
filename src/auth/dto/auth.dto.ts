@@ -5,9 +5,12 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { Roles } from '@prisma/client';
+import { Roles, User } from '@prisma/client';
+import { Token } from '../entities/token.entity';
 
-export class RegisterDto {
+export class RegisterDto
+  implements Omit<User, 'id' | 'createdAt' | 'updateAt'>
+{
   @IsEmail()
   email: string;
 
@@ -27,7 +30,7 @@ export class RegisterDto {
   role: Roles;
 }
 
-export class LoginDto {
+export class LoginDto implements Pick<User, 'email' | 'password'> {
   @IsEmail()
   email: string;
 
@@ -35,7 +38,7 @@ export class LoginDto {
   password: string;
 }
 
-export class RefreshTokenDto {
+export class RefreshTokenDto implements Pick<Token, 'refreshToken'> {
   @IsNotEmpty()
   @IsString()
   refreshToken: string;

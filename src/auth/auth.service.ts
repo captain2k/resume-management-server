@@ -6,10 +6,10 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/db/prisma.service';
 import { RegisterDto } from './dto/auth.dto';
-import { ResgisterResponse } from './response/register.response';
+import { ResgisterResponse } from './response/auth.response';
 import { createHash } from 'crypto';
 import { LoginDto } from './dto/auth.dto';
-import { LoginResponse } from './response/login.response';
+import { LoginResponse } from './response/auth.response';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Token, TokenPayload } from './entities/token.entity';

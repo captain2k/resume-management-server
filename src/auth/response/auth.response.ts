@@ -16,3 +16,5 @@ export class ResgisterResponse {
   user: UserEntity;
   token: Token;
 }
+
+export class LoginResponse extends ResgisterResponse {}
