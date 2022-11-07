@@ -2,6 +2,8 @@ import { Profile } from '@prisma/client';
 
 export class ProfileEntity implements Profile {
   id: string;
-  introduction: string;
+  createdAt: Date;
+  updateAt: Date;
+  introduction: string | null;
   userId: string;
 }

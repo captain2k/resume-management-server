@@ -9,6 +9,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { TechnologiesModule } from './technologies/technologies.module';
 import { UsersModule } from './users/users.module';
 import { WorkingHistoriesModule } from './working-histories/working-histories.module';
+import { ProfileTechnologiesModule } from './profile-technologies/profile-technologies.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WorkingHistoriesModule } from './working-histories/working-histories.mo
     WorkingHistoriesModule,
     UsersModule,
     ProfilesModule,
+    ProfileTechnologiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
