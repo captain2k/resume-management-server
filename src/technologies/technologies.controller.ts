@@ -20,7 +20,6 @@ import { TechnologiesService } from './technologies.service';
 import { Roles as PRoles } from '@prisma/client';
 
 @Controller('technologies')
-@UseGuards(AuthGuard)
 @ApiTags('Technology')
 export class TechnologiesController {
   constructor(private readonly technologyService: TechnologiesService) {}

@@ -70,7 +70,6 @@ export class TechnologiesService {
 
   async getMany(query: GetTechnologiesArgs): Promise<GetTechnologiesResponse> {
     const { limit, offset, name } = query;
-
     const where: Prisma.TechnologyWhereInput = {
       name: {
         contains: name,
