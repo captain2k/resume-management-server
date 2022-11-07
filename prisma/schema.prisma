@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -19,14 +20,17 @@ enum Roles {
 model User {
   id String @id @default(uuid())
 
-  email    String @unique
-  password String
-
+  email     String @unique
+  password  String
   lastName  String
   firstName String
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
   role Roles @default(HR)
 
+  profile Profile[]
 }
 
 model Technology {
@@ -34,5 +38,91 @@ model Technology {
 
   name String @unique
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  technologyProjects         TechnologyProject[]
+  workingHistoryTechnologies WorkingHistoryTechnology[]
+
   @@map("technology")
+}
+
+model Project {
+  id String @id @default(uuid())
+
+  title       String
+  description String
+  startDate   DateTime?
+  endDate     DateTime?
+  duration    Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  technologyProjects TechnologyProject[]
+  workingHistories   WorkingHistory[]
+
+  @@map("project")
+}
+
+model WorkingHistory {
+  id String @id @default(uuid())
+
+  role             String
+  responsibilities String? @db.Text
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+
+  workingHistoryTechnologies WorkingHistoryTechnology[]
+
+  @@map("working_history")
+}
+
+model Profile {
+  id String @id @default(uuid())
+
+  introduction String? @db.Text
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  workingHistories WorkingHistory[]
+
+  @@map("profile")
+}
+
+model TechnologyProject {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+  technologyId String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String
+
+  @@unique([technologyId, projectId])
+  @@map("technology-project")
+}
+
+model WorkingHistoryTechnology {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  technologyId     String
+  technology       Technology     @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+  workingHistoryId String
+  workingHistory   WorkingHistory @relation(fields: [workingHistoryId], references: [id], onDelete: Cascade)
+
+  @@unique([technologyId, workingHistoryId])
+  @@map("working_history-technology")
 }

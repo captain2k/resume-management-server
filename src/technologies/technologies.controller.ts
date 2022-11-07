@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 import { GetTechnologiesArgs } from './args/technology.args';
 import { CreateTechnologyDto, UpdateTechnologyDto } from './dto/technology.dto';
 import { TechnologyEntity } from './entities/technology.entity';
@@ -20,6 +21,7 @@ import { Roles as PRoles } from '@prisma/client';
 
 @Controller('technologies')
 @UseGuards(AuthGuard)
+@ApiTags('Technology')
 export class TechnologiesController {
   constructor(private readonly technologyService: TechnologiesService) {}
 

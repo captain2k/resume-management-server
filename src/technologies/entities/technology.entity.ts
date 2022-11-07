@@ -4,4 +4,7 @@ export class TechnologyEntity implements Technology {
   id: string;
 
   name: string;
+
+  createdAt: Date;
+  updateAt: Date;
 }

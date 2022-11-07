@@ -14,6 +14,7 @@ export class UserEntity implements User {
 
   lastName: string;
   firstName: string;
-
   role: Roles;
+  createdAt: Date;
+  updateAt: Date;
 }
