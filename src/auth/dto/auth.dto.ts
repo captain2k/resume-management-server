@@ -23,7 +23,7 @@ export class RegisterDto {
   @IsString()
   firstName: string;
 
-  @IsEnum(Roles)
+  @IsEnum([Roles.DEV, Roles.HR])
   role: Roles;
 }
 
