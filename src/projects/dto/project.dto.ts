@@ -5,8 +5,11 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { ProjectEntity } from '../entities/project.entity';
 
-export class CreateProjectDto {
+export class CreateProjectDto
+  implements Omit<ProjectEntity, 'id' | 'createdAt' | 'updateAt'>
+{
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -17,11 +20,11 @@ export class CreateProjectDto {
 
   @IsDate()
   @IsOptional()
-  startDate?: Date;
+  startDate: Date | null;
 
   @IsDate()
   @IsOptional()
-  endDate?: Date;
+  endDate: Date | null;
 
   @IsNotEmpty()
   @IsNumber()
@@ -32,7 +35,9 @@ export class CreateProjectDto {
   technologyIds?: string[];
 }
 
-export class UpdateProjectDto {
+export class UpdateProjectDto
+  implements Partial<Omit<ProjectEntity, 'id' | 'createdAt' | 'updateAt'>>
+{
   @IsString()
   @IsOptional()
   title?: string;

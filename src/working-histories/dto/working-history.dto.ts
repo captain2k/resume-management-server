@@ -1,13 +1,16 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { WorkingHistoryEntity } from '../entities/working-history.entities';
 
-export class CreateWorkingHistoryDto {
+export class CreateWorkingHistoryDto
+  implements Omit<WorkingHistoryEntity, 'id' | 'createdAt' | 'updateAt'>
+{
   @IsString()
   @IsNotEmpty()
   role: string;
 
   @IsString()
   @IsOptional()
-  responsibilities?: string;
+  responsibilities: string | null;
 
   @IsString()
   @IsNotEmpty()
@@ -22,7 +25,9 @@ export class CreateWorkingHistoryDto {
   technologyIds?: string[];
 }
 
-export class UpdateWorkingHistoryDto {
+export class UpdateWorkingHistoryDto
+  implements Partial<Pick<WorkingHistoryEntity, 'role' | 'responsibilities'>>
+{
   @IsOptional()
   @IsString()
   role?: string;

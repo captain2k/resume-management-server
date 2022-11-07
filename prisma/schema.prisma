@@ -35,6 +35,7 @@ model Technology {
 
   technologyProjects         TechnologyProject[]
   workingHistoryTechnologies WorkingHistoryTechnology[]
+  profileTechnology          ProfileTechnology[]
 
   @@map("technology")
 }
@@ -81,12 +82,30 @@ model Profile {
 
   introduction String? @db.Text
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  workingHistories WorkingHistory[]
+  workingHistories  WorkingHistory[]
+  profileTechnology ProfileTechnology[]
 
   @@map("profile")
+}
+
+model ProfileTechnology {
+  id String @id @default(uuid())
+
+  yoe Float
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  profileId    String
+  profile      Profile    @relation(fields: [profileId], references: [id])
+  technologyId String
+  technology   Technology @relation(fields: [technologyId], references: [id])
 }
 
 model TechnologyProject {
