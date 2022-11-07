@@ -115,6 +115,8 @@ model ProfileTechnology {
   profile      Profile    @relation(fields: [profileId], references: [id])
   technologyId String
   technology   Technology @relation(fields: [technologyId], references: [id])
+
+  @@map("profile_technology")
 }
 
 model TechnologyProject {
