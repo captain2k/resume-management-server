@@ -11,11 +11,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Roles {
+  ADMIN
+  HR
+  DEV
+}
+
 model User {
   id String @id @default(uuid())
 
-  email String  @unique
-  name  String?
+  email     String @unique
+  password  String
+  lastName  String
+  firstName String
+  role      Roles
 
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
@@ -106,6 +115,8 @@ model ProfileTechnology {
   profile      Profile    @relation(fields: [profileId], references: [id])
   technologyId String
   technology   Technology @relation(fields: [technologyId], references: [id])
+
+  @@map("profile_technology")
 }
 
 model TechnologyProject {

@@ -9,7 +9,7 @@ ALTER TABLE "profile" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT C
 ADD COLUMN     "updateAt" TIMESTAMP(3) NOT NULL;
 
 -- CreateTable
-CREATE TABLE "ProfileTechnology" (
+CREATE TABLE "profile_technology" (
     "id" TEXT NOT NULL,
     "yoe" DOUBLE PRECISION NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -17,11 +17,11 @@ CREATE TABLE "ProfileTechnology" (
     "profileId" TEXT NOT NULL,
     "technologyId" TEXT NOT NULL,
 
-    CONSTRAINT "ProfileTechnology_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "profile_technology_pkey" PRIMARY KEY ("id")
 );
 
 -- AddForeignKey
-ALTER TABLE "ProfileTechnology" ADD CONSTRAINT "ProfileTechnology_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "profile_technology" ADD CONSTRAINT "profile_technology_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProfileTechnology" ADD CONSTRAINT "ProfileTechnology_technologyId_fkey" FOREIGN KEY ("technologyId") REFERENCES "technology"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "profile_technology" ADD CONSTRAINT "profile_technology_technologyId_fkey" FOREIGN KEY ("technologyId") REFERENCES "technology"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
