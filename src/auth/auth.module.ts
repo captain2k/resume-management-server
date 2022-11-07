@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtConfig } from './jwt.config';
 import { PrismaModule } from 'src/db/prisma.module';
 import { AuthGuard } from './auth.guard';
+import { ThirdPartyModule } from 'src/third-party/third-party.module';
 
 @Module({
   providers: [AuthService, AuthGuard],
@@ -16,6 +17,7 @@ import { AuthGuard } from './auth.guard';
       imports: [ConfigModule],
       useClass: JwtConfig,
     }),
+    ThirdPartyModule,
   ],
   exports: [AuthService, AuthGuard],
 })
