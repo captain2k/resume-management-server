@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Roles } from '@prisma/client';
-import { AzureService } from 'src/third-party/azure.service';
 import { AuthService } from './auth.service';
 import { TokenPayload } from './entities/token.entity';
 import { ROLES_KEY } from './roles.decorator';
@@ -17,16 +16,12 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly reflector: Reflector,
-    private readonly azureService: AzureService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
     const authHeader: string = request.headers.authorization;
-
-    const data = await this.azureService.verify(authHeader);
-    console.log(data);
 
     if (!authHeader) throw new UnauthorizedException('You are unauthorized');
 

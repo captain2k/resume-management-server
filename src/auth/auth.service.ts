@@ -11,7 +11,7 @@ import { createHash } from 'crypto';
 import { LoginDto } from './dto/auth.dto';
 import { LoginResponse } from './response/login.response';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { Token, TokenPayload } from './entities/token.entity';
 
 @Injectable()

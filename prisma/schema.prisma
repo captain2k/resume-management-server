@@ -24,13 +24,14 @@ model User {
   password  String
   lastName  String
   firstName String
+  role      Roles
 
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  role Roles @default(HR)
-
   profile Profile[]
+
+  @@map("user")
 }
 
 model Technology {
