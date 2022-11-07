@@ -6,6 +6,6 @@ export class Token {
 }
 
 export class TokenPayload {
-  id: string;
+  userId: string;
   role: Roles;
 }

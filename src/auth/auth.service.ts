@@ -70,7 +70,7 @@ export class AuthService {
 
     const user = await this.prisma.user.findFirst({
       where: {
-        id: token.id,
+        id: token.userId,
       },
     });
 
@@ -84,10 +84,8 @@ export class AuthService {
     const token = bearerToken.split(' ')[1];
     const payload = this.verifyToken(token);
 
-    const { id: userId } = payload;
-
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: payload.userId },
       select: {
         id: true,
         email: true,

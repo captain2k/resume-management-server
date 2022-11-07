@@ -32,6 +32,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @UseGuards(AuthGuard)
   me(@Req() req) {
     return this.authService.me(req.headers.authorization);
   }
