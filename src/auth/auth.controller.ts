@@ -1,11 +1,18 @@
-import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto, RefreshTokenDto } from './dto/auth.dto';
 import { RegisterDto } from './dto/auth.dto';
 
 @Controller('auth')
-@UseGuards(AuthGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -22,5 +29,10 @@ export class AuthController {
   @Put('refresh-token')
   refreshToken(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshToken(dto.refreshToken);
+  }
+
+  @Get('me')
+  me(@Req() req) {
+    return this.authService.me(req.headers.authorization);
   }
 }

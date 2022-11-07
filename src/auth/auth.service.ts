@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,6 +14,7 @@ import { LoginResponse } from './response/auth.response';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Token, TokenPayload } from './entities/token.entity';
+import { UserResponse } from 'src/users/response/user.reponse';
 
 @Injectable()
 export class AuthService {
@@ -76,6 +78,30 @@ export class AuthService {
       user: new UserEntity(user),
       token: this.genToken(user),
     };
+  }
+
+  async me(bearerToken: string): Promise<UserResponse> {
+    const token = bearerToken.split(' ')[1];
+    const payload = this.verifyToken(token);
+
+    const { id: userId } = payload;
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updateAt: true,
+        role: true,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User does not exist');
+
+    return new UserResponse(user);
   }
 
   private genToken(dto: Pick<UserEntity, 'id' | 'role'>): Token {
