@@ -96,6 +96,7 @@ export class TechnologiesService {
       data: technologies,
     };
   }
+
   private async checkDuplicateName(name: string): Promise<void> {
     const checkTechnologyName = await this.prisma.technology.findUnique({
       where: {
