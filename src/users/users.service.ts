@@ -1,5 +1,5 @@
 import {
-  ForbiddenException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/db/prisma.service';
 import { UserArgs } from './args/user.args';
-import { UpdateUserDto } from './dto/user.dto';
+import { ChangePasswordDto, UpdateUserDto } from './dto/user.dto';
 import { GetUsersResponse, UserResponse } from './response/user.response';
 
 @Injectable()
@@ -32,56 +32,48 @@ export class UsersService {
     return new UserResponse(user);
   }
 
-  async getMany(query: UserArgs): Promise<any> {
+  async getMany(query: UserArgs): Promise<GetUsersResponse> {
     const { limit, name, offset } = query;
 
     const where: Prisma.UserWhereInput = {
       OR: [
         {
           firstName: {
-            contains: name,
+            contains: name ? name : '',
             mode: 'insensitive',
           },
         },
         {
           lastName: {
-            contains: name,
+            contains: name ? name : '',
             mode: 'insensitive',
           },
         },
       ],
     };
 
-    const like = `%${name}%`;
-    const result = await this.prisma
-      .$queryRaw`SELECT * FROM "public"."user" WHERE "firstName" ILIKE ${like}`;
+    const [total, users] = await this.prisma.$transaction([
+      this.prisma.user.count({
+        where,
+      }),
+      this.prisma.user.findMany({
+        where,
+        include: {
+          profile: true,
+        },
+        skip: offset,
+        take: limit,
+      }),
+    ]);
 
-    // const [total] = await this.prisma.$transaction([
-    //   this.prisma.user.`SELECT * FROM user`,
-    // ]);
-
-    // const [total, users] = await this.prisma.$transaction([
-    //   this.prisma.user.count({
-    //     where,
-    //   }),
-    //   this.prisma.user.findMany({
-    //     where,
-    //     include: {
-    //       profile: true,
-    //     },
-    //     skip: offset,
-    //     take: limit,
-    //   }),
-    // ]);
-    return result;
-    // return {
-    //   data: users.map((user) => new UserResponse(user)),
-    //   pagination: {
-    //     limit,
-    //     offset,
-    //     total,
-    //   },
-    // };
+    return {
+      data: users.map((user) => new UserResponse(user)),
+      pagination: {
+        limit,
+        offset,
+        total,
+      },
+    };
   }
 
   async update(bearerToken: string, dto: UpdateUserDto): Promise<UserResponse> {
@@ -91,8 +83,6 @@ export class UsersService {
     const { userId } = this.authService.verifyToken(token);
 
     const user = await this.getOne(userId);
-
-    if (user.id !== userId) throw new ForbiddenException();
 
     if (firstName === user.firstName && lastName === user.lastName)
       return new UserResponse(user);
@@ -106,5 +96,25 @@ export class UsersService {
     });
 
     return new UserResponse(updatedUser);
+  }
+
+  async changePassword(id: string, dto: ChangePasswordDto): Promise<boolean> {
+    const user = await this.getOne(id);
+    const { newPassword, oldPassword } = dto;
+
+    const hashOldPassword = this.authService.hashPassword(oldPassword);
+
+    if (hashOldPassword !== user.password) throw new ConflictException();
+
+    const hassNewPassword = this.authService.hashPassword(newPassword);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        password: hassNewPassword,
+      },
+    });
+
+    return true;
   }
 }
