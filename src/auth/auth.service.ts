@@ -80,12 +80,11 @@ export class AuthService {
     };
   }
 
-  async me(bearerToken: string): Promise<UserResponse> {
-    const token = bearerToken.split(' ')[1];
-    const payload = this.verifyToken(token);
+  async me(userPayload: TokenPayload): Promise<UserResponse> {
+    const { userId } = userPayload;
 
     const user = await this.prisma.user.findUnique({
-      where: { id: payload.userId },
+      where: { id: userId },
       select: {
         id: true,
         email: true,
