@@ -14,7 +14,7 @@ import { LoginResponse } from './response/auth.response';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Token, TokenPayload } from './entities/token.entity';
-import { UserResponse } from 'src/users/response/user.reponse';
+import { UserResponse } from 'src/users/response/user.response';
 
 @Injectable()
 export class AuthService {

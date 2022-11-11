@@ -29,6 +29,7 @@ export class AuthController {
   }
 
   @Put('refresh-token')
+  @UseGuards(AuthGuard)
   refreshToken(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshToken(dto.refreshToken);
   }

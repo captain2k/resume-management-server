@@ -70,7 +70,6 @@ export class TechnologiesService {
 
   async getMany(query: GetTechnologiesArgs): Promise<GetTechnologiesResponse> {
     const { limit, offset, name } = query;
-
     const where: Prisma.TechnologyWhereInput = {
       name: {
         contains: name,
@@ -97,6 +96,7 @@ export class TechnologiesService {
       data: technologies,
     };
   }
+
   private async checkDuplicateName(name: string): Promise<void> {
     const checkTechnologyName = await this.prisma.technology.findUnique({
       where: {
